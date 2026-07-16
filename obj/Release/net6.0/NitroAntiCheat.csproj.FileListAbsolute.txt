@@ -1,0 +1,10 @@
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\bin\Release\net6.0\NitroAntiCheat.deps.json
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\bin\Release\net6.0\NitroAntiCheat.dll
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\obj\Release\net6.0\NitroAntiCheat.csproj.AssemblyReference.cache
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\obj\Release\net6.0\NitroAntiCheat.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\obj\Release\net6.0\NitroAntiCheat.AssemblyInfoInputs.cache
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\obj\Release\net6.0\NitroAntiCheat.AssemblyInfo.cs
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\obj\Release\net6.0\NitroAntiCheat.csproj.CoreCompileInputs.cache
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\obj\Release\net6.0\NitroAntiCheat.dll
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\obj\Release\net6.0\refint\NitroAntiCheat.dll
+C:\Users\User\Downloads\NitroAntiCheat-src (1)\NitroAntiCheat\obj\Release\net6.0\ref\NitroAntiCheat.dll

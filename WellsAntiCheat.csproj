@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <DebugType>embedded</DebugType>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <VersionPrefix>1.0.0</VersionPrefix>
+        <AssemblyName>WellsAntiCheat</AssemblyName>
+        <Description>Wells Anti Cheat: host-side moderation for Among Us (name kick, spam/crash protection, meeting grace, RPC anti-cheat, host map tools). Host only.</Description>
+        <Authors>you</Authors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.735" Private="false" ExcludeAssets="runtime;native" />
+        <!-- Pin this to the Among Us version you actually run. Check the version in the game's main menu. -->
+        <PackageReference Include="AmongUs.GameLibs.Steam" Version="2026.6.5" PrivateAssets="all" />
+        <PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" PrivateAssets="all" ExcludeAssets="runtime" />
+    </ItemGroup>
+
+    <!-- Optional: set the AmongUs env var (or edit this path) to auto-copy the built DLL into your plugins folder -->
+    <Target Name="CopyToGame" AfterTargets="Build" Condition="'$(AmongUs)' != ''">
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(AmongUs)/BepInEx/plugins/" />
+        <Copy SourceFiles="$(TargetDir)$(TargetName).deps.json" DestinationFolder="$(AmongUs)/BepInEx/plugins/" />
+    </Target>
+</Project>

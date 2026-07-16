@@ -27,28 +27,6 @@ A host-side moderation mod for Among Us. It protects your lobby and does **nothi
 - **Nothing happens when you're not host.** Detection still runs and still notifies you of cheaters, but no RPC is discarded and no one is kicked/banned. In the panel, every control is grayed out and can't be toggled while you're not host — so a mistoggle can't get you kicked by your own tool.
 - **Kicking/banning is host-only** and gated twice (dispatcher + `Flag`).
 
----
-
-## Why you have to build it yourself
-
-This is an IL2CPP BepInEx plugin. It must be compiled against the game's interop assemblies, generated from *your* Among Us build. There's no universal prebuilt `.dll`. The build takes ~2 minutes.
-
-## Prerequisites
-- **.NET 6 SDK** — https://dotnet.microsoft.com/download/dotnet/6.0
-- **BepInEx 6 (IL2CPP)** in your Among Us folder — https://builds.bepinex.dev/projects/bepinex_be
-  (Run the game once with BepInEx installed so interop assemblies generate.)
-
-## Build
-1. Check your Among Us version (main menu).
-2. In `WellsAntiCheat.csproj`, set `AmongUs.GameLibs.Steam` to match:
-   ```xml
-   <PackageReference Include="AmongUs.GameLibs.Steam" Version="2026.6.5" PrivateAssets="all" />
-   ```
-3. Run:
-   ```
-   dotnet build -c Release
-   ```
-4. Output: `bin/Release/net6.0/WellsAntiCheat.dll`. (Set an `AmongUs` env var to your game folder to auto-copy into `BepInEx/plugins/`.)
 
 ## Install
 Copy `WellsAntiCheat.dll` into `<Among Us>/BepInEx/plugins/` and launch.

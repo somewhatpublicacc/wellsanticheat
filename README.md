@@ -23,6 +23,23 @@ A host-side moderation mod for Among Us. It protects your lobby, does **nothing*
 
 **RPC anti-cheat** — illegal vents, teleports in lobby, impostors completing tasks, start-counter spoofing, early meetings, plus **role-exploit checks**: invalid kills, shapeshifting without being a Shapeshifter, vanishing without being a Phantom, protecting without being a Guardian Angel.
 
+**Sabotage / system protection (from Hydra)** — validates `UpdateSystem`: blocks reactor force-fix and force-call crashes, mushroom-mixup spoofing, switch-panel crash payloads, sabotaging as a non-impostor, and sabotage during Hide and Seek. Also door-close in Hide and Seek.
+
+**More RPC exploit checks (from Hydra)** — fake visual-task animations (`PlayAnimation`), the never-legitimate `Exiled` RPC, invalid colour / net-id (`SetColor`), fake medbay scans (`SetScanner`), airship platform misuse (`UsePlatform`), and level spoofing (`SetLevel`).
+
+**Votekick abuse** — blocks votekicks from unknown clients, dead players, or outside a meeting.
+
+**Banned players (notepad)** — an editable list in the panel (also `BepInEx/config/NitroAntiCheat_banned.txt`). One player name or friend code per line; matches are auto-kicked while you host. Editable even when you're not host.
+
+**Auto-mute (meeting)** — optional, off by default. "Mute" = the host silently drops the player's chat RPCs for the rest of the meeting (Among Us has no native mute). Two triggers: mute a player once they hold a **majority of votes** (stops a dying impostor leaking), or mute the player of a **colour a majority of living players name in chat**.
+
+**Exploit protection (self-defense, works even when you're not host)** — blocks known mass-grief attacks aimed at you:
+- **Ventilation kick/ban exploit** — the "everyone gets banned by InnerSloth" attack (forged `UpdateSystem(Ventilation)` to non-host clients). Blocked.
+- **Forced teleport / mass-vent** — forged `SnapTo` aimed at your own player. Blocked.
+- **Voting-overload crash** — `VotingComplete` with a huge array length that forces gigabytes of allocation. Blocked.
+- **Oversized messages** — game-data messages over 1400 bytes dropped.
+Forgeable vent/movement/teleport checks are discard-only (they block the bad effect but never kick the apparent sender, so a forged mass-vent can't make Nitro kick the victims).
+
 **Meeting grace** — blocks meetings called before a configurable window (default 10s) after each round starts. Catches modded clients that fire the meeting RPC directly.
 
 **Modded lobby toggle** — one switch loosens role/gameplay-semantic checks so role mods don't false-positive; name, spam, cheat-client, and crash detection stay active.

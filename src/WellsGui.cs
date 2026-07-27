@@ -163,18 +163,36 @@ namespace WellsAntiCheat
             Header("Appearance");
             RainbowGui = GUILayout.Toggle(RainbowGui, " Rainbow GUI");
 
-            // Banned-players notepad. Editable even when not host (it's just a text file), so
-            // re-enable the GUI for this section then restore the host gate afterwards.
+            // Banned-players editor. In-game text fields crash on this stripped IL2CPP build
+            // (GUI.DoTextField can't be unstripped), so we use buttons instead. For bulk edits,
+            // edit BepInEx/config/NitroAntiCheat_banned.txt in a real text editor and hit Reload.
             bool prevEnabled = GUI.enabled;
             GUI.enabled = true;
-            Header("Banned players (notepad)");
+            Header("Ban a player in this lobby");
             BannedPlayers.Enabled = GUILayout.Toggle(BannedPlayers.Enabled, " Auto-kick banned players (host only)");
-            GUILayout.Label("One name or friend code per line:");
-            BannedPlayers.RawText = GUILayout.TextArea(BannedPlayers.RawText, GUILayout.Height(110));
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save")) BannedPlayers.Save();
-            if (GUILayout.Button("Reload")) BannedPlayers.Load();
-            GUILayout.EndHorizontal();
+            foreach (PlayerControl p in PlayerControl.AllPlayerControls)
+            {
+                if (p == null || p.Data == null || p.AmOwner) continue;
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(Anticheat.Name(p), GUILayout.Width(150));
+                if (GUILayout.Button("Ban", GUILayout.Width(70)))
+                {
+                    var code = p.Data.FriendCode ?? "";
+                    BannedPlayers.Add(code.Length > 0 ? code : p.Data.PlayerName);
+                }
+                GUILayout.EndHorizontal();
+            }
+
+            Header("Banned entries");
+            foreach (var entry in BannedPlayers.EntryList())
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(entry, GUILayout.Width(150));
+                if (GUILayout.Button("Unban", GUILayout.Width(70)))
+                    BannedPlayers.Remove(entry);
+                GUILayout.EndHorizontal();
+            }
+            if (GUILayout.Button("Reload file")) BannedPlayers.Load();
             GUI.enabled = prevEnabled;
 
             Header("Host tools");

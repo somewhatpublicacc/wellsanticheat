@@ -72,5 +72,28 @@ namespace WellsAntiCheat
             return (name.Length > 0 && _entries.Contains(name))
                 || (code.Length > 0 && _entries.Contains(code));
         }
+
+        // For the GUI: current banned entries, and removal.
+        public static List<string> EntryList()
+        {
+            var list = new List<string>(_entries);
+            list.Sort(StringComparer.OrdinalIgnoreCase);
+            return list;
+        }
+
+        public static void Remove(string entry)
+        {
+            if (string.IsNullOrWhiteSpace(entry)) return;
+            var kept = new List<string>();
+            foreach (var raw in RawText.Replace("\r", "").Split('\n'))
+            {
+                var line = raw.Trim();
+                if (line.Length == 0 || line.StartsWith("#")) { kept.Add(raw); continue; }
+                if (string.Equals(line, entry.Trim(), StringComparison.OrdinalIgnoreCase)) continue;
+                kept.Add(raw);
+            }
+            RawText = string.Join("\n", kept);
+            Save();
+        }
     }
 }

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (5)\\NitroAntiCheat\\NitroAntiCheat.csproj": {}
+    "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (6)\\NitroAntiCheat\\NitroAntiCheat.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (5)\\NitroAntiCheat\\NitroAntiCheat.csproj": {
+    "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (6)\\NitroAntiCheat\\NitroAntiCheat.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (5)\\NitroAntiCheat\\NitroAntiCheat.csproj",
+        "projectUniqueName": "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (6)\\NitroAntiCheat\\NitroAntiCheat.csproj",
         "projectName": "NitroAntiCheat",
-        "projectPath": "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (5)\\NitroAntiCheat\\NitroAntiCheat.csproj",
+        "projectPath": "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (6)\\NitroAntiCheat\\NitroAntiCheat.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (5)\\NitroAntiCheat\\obj\\",
+        "outputPath": "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (6)\\NitroAntiCheat\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (5)\\NitroAntiCheat\\NuGet.Config",
+          "C:\\Users\\User\\Downloads\\NitroAntiCheat-src (6)\\NitroAntiCheat\\NuGet.Config",
           "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [

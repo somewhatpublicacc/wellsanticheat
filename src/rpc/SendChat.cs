@@ -19,6 +19,16 @@ namespace WellsAntiCheat.Rpc
 
             string message = reader.ReadString();
 
+            // Muted players (this meeting): silently drop their chat so it never propagates.
+            if (MuteManager.IsMuted(player))
+            {
+                blockRpc = true;
+                return;
+            }
+
+            // Feed the chat-consensus mute trigger (does nothing unless enabled + hosting).
+            MuteManager.RecordChatColorVote(player, message);
+
             if (message != null && message.Length > MaxMessageLength)
             {
                 blockRpc = true;

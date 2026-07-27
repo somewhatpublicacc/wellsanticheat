@@ -44,6 +44,16 @@ namespace WellsAntiCheat
             { RpcCalls.Shapeshift,       new Shapeshift() },
             { RpcCalls.StartVanish,      new StartVanish() },
             { RpcCalls.ProtectPlayer,    new ProtectPlayer() },
+            // sabotage / system checks (ShipStatus + VoteBanSystem net objects)
+            { RpcCalls.UpdateSystem,     new UpdateSystem() },
+            { RpcCalls.CloseDoorsOfType, new CloseDoorsOfType() },
+            // cosmetic / task exploit checks
+            { RpcCalls.PlayAnimation,    new PlayAnimation() },
+            { RpcCalls.Exiled,           new Exiled() },
+            { RpcCalls.SetColor,         new SetColor() },
+            { RpcCalls.SetScanner,       new SetScanner() },
+            { RpcCalls.UsePlatform,      new UsePlatform() },
+            { RpcCalls.SetLevel,         new SetLevel() },
         };
 
         private static readonly Dictionary<RpcCalls, int> MinBytes = new()
@@ -88,6 +98,11 @@ namespace WellsAntiCheat
         private static bool IsSelf(PlayerControl player)
             => player != null && (player.AmOwner || player == PlayerControl.LocalPlayer);
 
+        // Never flag/block/punish: the local player OR anyone on the trusted list (any role, host
+        // or not). This is the single exemption gate used everywhere flagging can occur.
+        public static bool IsExempt(PlayerControl player)
+            => IsSelf(player) || TrustedPlayers.IsTrusted(player);
+
         // --- Harmony hooks ---
 
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRpc))]
@@ -111,11 +126,25 @@ namespace WellsAntiCheat
                 => HandleRpc(typeof(CustomNetworkTransform), __instance.myPlayer, callId, reader);
         }
 
+        // Sabotage / system RPCs (UpdateSystem, CloseDoorsOfType) route through ShipStatus with no
+        // owning player - the actor is read from the payload inside the check.
+        [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.HandleRpc))]
+        private static class OnShipStatusRpc
+        {
+            private static bool Prefix(byte callId, MessageReader reader)
+                => HandleRpc(typeof(ShipStatus), null, callId, reader);
+        }
+
         // Returns false to swallow the RPC, true to let it run.
         private static bool HandleRpc(Type sourceNetObj, PlayerControl player, byte callId, MessageReader reader)
         {
+            // Self-protection runs first and can block on ANY client (not just host), protecting
+            // the local player from mass-grief exploits regardless of the anticheat toggle.
+            if (Protections.ShouldBlock(sourceNetObj, player, callId, reader))
+                return false;
+
             if (!Enabled) return true;
-            if (IsSelf(player)) return true; // HOST EXEMPTION: never inspect our own RPCs
+            if (IsExempt(player)) return true; // EXEMPTION: local player + trusted users, never inspected
 
             RpcCalls rpc = (RpcCalls)callId;
             bool blockRpc = false;
@@ -194,7 +223,14 @@ namespace WellsAntiCheat
         {
             WellsPlugin.Log.LogMessage($"[Nitro] {reason}");
             if (SendNotification) Notifier.Show(reason);
-            if (AmHost && shouldPunish && !IsSelf(player)) Punish(player);
+            if (AmHost && shouldPunish && !IsExempt(player)) Punish(player);
+        }
+
+        // Used when the offending player can't be identified (e.g. ShipStatus-routed RPCs).
+        public static void Flag(string reason)
+        {
+            WellsPlugin.Log.LogMessage($"[Nitro] {reason}");
+            if (SendNotification) Notifier.Show(reason);
         }
 
         private static void Punish(PlayerControl player)

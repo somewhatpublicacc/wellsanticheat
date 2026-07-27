@@ -46,7 +46,7 @@ namespace WellsAntiCheat.Rpc
             if (ShipStatus.Instance == null)
             {
                 blockRpc = true;
-                Anticheat.Flag(player, $"{Anticheat.Name(player)} vented with no ShipStatus.");
+                Anticheat.Flag(player, $"{Anticheat.Name(player)} vented with no ShipStatus.", false);
                 return;
             }
 
@@ -55,7 +55,7 @@ namespace WellsAntiCheat.Rpc
             if (!player.Data.IsDead && !player.Data.Role.CanVent)
             {
                 blockRpc = true;
-                Anticheat.Flag(player, $"{Anticheat.Name(player)} vented but role ({player.Data.RoleType}) can't vent.");
+                Anticheat.Flag(player, $"{Anticheat.Name(player)} vented but role ({player.Data.RoleType}) can't vent.", false);
             }
         }
     }
@@ -69,7 +69,7 @@ namespace WellsAntiCheat.Rpc
             if (ShipStatus.Instance == null)
             {
                 blockRpc = true;
-                Anticheat.Flag(player, $"{Anticheat.Name(player)} exited a vent with no ShipStatus.");
+                Anticheat.Flag(player, $"{Anticheat.Name(player)} exited a vent with no ShipStatus.", false);
                 return;
             }
 
@@ -78,7 +78,7 @@ namespace WellsAntiCheat.Rpc
             if (!player.Data.IsDead && !player.Data.Role.CanVent)
             {
                 blockRpc = true;
-                Anticheat.Flag(player, $"{Anticheat.Name(player)} exited a vent but role ({player.Data.RoleType}) can't vent.");
+                Anticheat.Flag(player, $"{Anticheat.Name(player)} exited a vent but role ({player.Data.RoleType}) can't vent.", false);
             }
         }
     }
@@ -92,14 +92,14 @@ namespace WellsAntiCheat.Rpc
             if (ShipStatus.Instance == null)
             {
                 blockRpc = true;
-                Anticheat.Flag(player, $"{Anticheat.Name(player)} climbed a ladder with no ShipStatus.");
+                Anticheat.Flag(player, $"{Anticheat.Name(player)} climbed a ladder with no ShipStatus.", false);
                 return;
             }
 
             if (!player.Data.IsDead) return; // living players climbing is normal
 
             blockRpc = true;
-            Anticheat.Flag(player, $"{Anticheat.Name(player)} climbed a ladder while dead.");
+            Anticheat.Flag(player, $"{Anticheat.Name(player)} climbed a ladder while dead.", false);
         }
     }
 
@@ -115,7 +115,7 @@ namespace WellsAntiCheat.Rpc
             if (LobbyBehaviour.Instance != null)
             {
                 blockRpc = true;
-                Anticheat.Flag(player, $"{Anticheat.Name(player)} used SnapTo (teleport) inside the lobby.");
+                Anticheat.Flag(player, $"{Anticheat.Name(player)} used SnapTo (teleport) inside the lobby.", false);
 
                 // Snap them back so the illegitimate move doesn't stick for other clients.
                 if (AmongUsClient.Instance.AmHost && player?.NetTransform != null)

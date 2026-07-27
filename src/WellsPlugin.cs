@@ -31,6 +31,7 @@ namespace WellsAntiCheat
             var punishment    = Config.Bind("General", "Punishment", "Kick", "Action on a flagged player: None, Kick, or Ban.");
             var keyCfg        = Config.Bind("General", "ToggleKey", "F8", "Key to open/close the panel.");
             var rainbow       = Config.Bind("General", "RainbowGui", true, "Cycle the GUI colour.");
+            var bannedList    = Config.Bind("General", "BannedListEnabled", true, "Auto-kick players on the banned list.");
 
             var crash         = Config.Bind("Crash", "CrashProtection", true, "Master switch for crash/flood protection.");
             var malformed     = Config.Bind("Crash", "CheckMalformed", true, "Flag malformed (too-short) RPC payloads.");
@@ -45,6 +46,13 @@ namespace WellsAntiCheat
 
             var graceCfg      = Config.Bind("Meeting", "GraceSeconds", 10f, "Seconds after a round starts before meetings are allowed.");
             var emergencyOnly = Config.Bind("Meeting", "EmergencyOnly", false, "Restrict only emergency-button meetings.");
+            var muteMajority  = Config.Bind("Meeting", "MuteOnMajorityVote", false, "Mute a player once they hold a majority of votes.");
+            var muteConsensus = Config.Bind("Meeting", "MuteOnChatConsensus", false, "Mute the player of a colour a majority of players name in chat.");
+
+            var pVent   = Config.Bind("Protections", "BlockVentKickExploit", true, "Block the ventilation kick/ban exploit aimed at you.");
+            var pTp     = Config.Bind("Protections", "BlockServerTeleports", true, "Block forced teleports (mass vent) aimed at you.");
+            var pVote   = Config.Bind("Protections", "BlockVotingOverload", true, "Block the voting-complete out-of-memory crash.");
+            var pLarge  = Config.Bind("Protections", "BlockLargeMessages", true, "Drop oversized game-data messages.");
 
             Anticheat.Enabled          = antiCheat.Value;
             Anticheat.CrashProtection  = crash.Value;
@@ -64,12 +72,20 @@ namespace WellsAntiCheat
             MeetingTimer.Enabled       = meetingTimer.Value;
             MeetingTimer.GraceSeconds  = graceCfg.Value;
             MeetingTimer.EmergencyOnly = emergencyOnly.Value;
+            MuteManager.MuteOnMajorityVote = muteMajority.Value;
+            MuteManager.MuteOnChatConsensus = muteConsensus.Value;
+            Protections.BlockVentKickExploit = pVent.Value;
+            Protections.BlockServerTeleports = pTp.Value;
+            Protections.BlockVotingOverload = pVote.Value;
+            Protections.BlockLargeMessages = pLarge.Value;
             WellsGui.RainbowGui        = rainbow.Value;
+            BannedPlayers.Enabled      = bannedList.Value;
 
             if (System.Enum.TryParse<KeyCode>(keyCfg.Value, true, out var key))
                 WellsGui.ToggleKey = key;
 
             NameFilter.Load();
+            BannedPlayers.Load();
             _harmony.PatchAll();
             AddComponent<WellsGui>();
 

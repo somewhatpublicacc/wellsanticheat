@@ -19,10 +19,49 @@ namespace WellsAntiCheat
         private Vector2 _scroll = Vector2.zero;
         private const int WindowId = 0x4E495452; // "NITR"
 
+        private float _banTimer;
+        private bool _loggedSelf;
+
         private void Update()
         {
             if (Input.GetKeyDown(ToggleKey))
                 _open = !_open;
+
+            LogSelfOnce();
+            EnforceBans();
+            MuteManager.CheckMajorityVotes();
+        }
+
+        // Prints your own friend code + name to the BepInEx console once, so you can paste the
+        // exact value into the hardcoded trusted list in TrustedPlayers.cs. Only visible in your log.
+        private void LogSelfOnce()
+        {
+            if (_loggedSelf) return;
+            var me = PlayerControl.LocalPlayer;
+            if (me == null || me.Data == null) return;
+            _loggedSelf = true;
+            WellsPlugin.Log.LogInfo($"[Nitro] Your identifiers -> FriendCode: '{me.Data.FriendCode}'  Name: '{me.Data.PlayerName}'");
+        }
+
+        // Host-only: periodically kick anyone on the banned list. Never touches the local player.
+        private void EnforceBans()
+        {
+            if (!BannedPlayers.Enabled) return;
+            if (AmongUsClient.Instance == null || !AmongUsClient.Instance.AmHost) return;
+
+            _banTimer += Time.deltaTime;
+            if (_banTimer < 2f) return;
+            _banTimer = 0f;
+
+            foreach (PlayerControl p in PlayerControl.AllPlayerControls)
+            {
+                if (p == null || Anticheat.IsExempt(p)) continue; // never ban self or trusted users
+                if (BannedPlayers.IsBanned(p))
+                {
+                    Anticheat.Flag(p, $"{Anticheat.Name(p)} is on the banned list.", false);
+                    AmongUsClient.Instance.KickPlayer(p.OwnerId, true);
+                }
+            }
         }
 
         // Current cycling accent colour.
@@ -88,6 +127,7 @@ namespace WellsAntiCheat
             Header("Chat");
             var chat = Anticheat.RpcHandlers.TryGetValue(RpcCalls.SendChat, out var sc) ? sc : null;
             if (chat != null) chat.Enabled = GUILayout.Toggle(chat.Enabled, " Chat spam / oversized message");
+            WellsAntiCheat.Rpc.VoteKickGuard.Enabled = GUILayout.Toggle(WellsAntiCheat.Rpc.VoteKickGuard.Enabled, " Votekick abuse (dead / no-meeting)");
 
             Header("Meeting grace");
             MeetingTimer.Enabled = GUILayout.Toggle(MeetingTimer.Enabled, " Block early meetings");
@@ -96,6 +136,16 @@ namespace WellsAntiCheat
             GUILayout.Label($"Grace: {MeetingTimer.GraceSeconds:0}s", GUILayout.Width(80));
             MeetingTimer.GraceSeconds = Mathf.Round(GUILayout.HorizontalSlider(MeetingTimer.GraceSeconds, 0f, 30f));
             GUILayout.EndHorizontal();
+
+            Header("Exploit protection (self-defense)");
+            Protections.BlockVentKickExploit = GUILayout.Toggle(Protections.BlockVentKickExploit, " Block ventilation kick/ban exploit");
+            Protections.BlockServerTeleports = GUILayout.Toggle(Protections.BlockServerTeleports, " Block forced teleports (mass vent)");
+            Protections.BlockVotingOverload = GUILayout.Toggle(Protections.BlockVotingOverload, " Block voting-overload crash");
+            Protections.BlockLargeMessages = GUILayout.Toggle(Protections.BlockLargeMessages, " Block oversized messages");
+
+            Header("Auto-mute (meeting)");
+            MuteManager.MuteOnMajorityVote = GUILayout.Toggle(MuteManager.MuteOnMajorityVote, " Mute player with majority votes");
+            MuteManager.MuteOnChatConsensus = GUILayout.Toggle(MuteManager.MuteOnChatConsensus, " Mute by chat colour vote");
 
             Header("On violation");
             Anticheat.SendNotification = GUILayout.Toggle(Anticheat.SendNotification, " Notify");
@@ -112,6 +162,20 @@ namespace WellsAntiCheat
 
             Header("Appearance");
             RainbowGui = GUILayout.Toggle(RainbowGui, " Rainbow GUI");
+
+            // Banned-players notepad. Editable even when not host (it's just a text file), so
+            // re-enable the GUI for this section then restore the host gate afterwards.
+            bool prevEnabled = GUI.enabled;
+            GUI.enabled = true;
+            Header("Banned players (notepad)");
+            BannedPlayers.Enabled = GUILayout.Toggle(BannedPlayers.Enabled, " Auto-kick banned players (host only)");
+            GUILayout.Label("One name or friend code per line:");
+            BannedPlayers.RawText = GUILayout.TextArea(BannedPlayers.RawText, GUILayout.Height(110));
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Save")) BannedPlayers.Save();
+            if (GUILayout.Button("Reload")) BannedPlayers.Load();
+            GUILayout.EndHorizontal();
+            GUI.enabled = prevEnabled;
 
             Header("Host tools");
             GUILayout.Label($"Map: {(MapNames)HostTools.SelectedMap}");
